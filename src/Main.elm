@@ -94,17 +94,57 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Guess cardIndex questionIndex input ->
-            case input |> String.toInt of
-                Just inputInteger ->
-                    ( model, Cmd.none )
+            let
+                maybeCard : Maybe Card
+                maybeCard =
+                    Array.get cardIndex model.cards
+
+                maybeQuestion : Maybe Question
+                maybeQuestion =
+                    maybeCard |> Maybe.andThen (\card -> Array.get questionIndex card.questions)
+            in
+            case ( maybeQuestion, maybeCard ) of
+                ( Just question, Just card ) ->
+                    let
+                        newQuestion : Question
+                        newQuestion =
+                            { question | guess = input }
+
+                        newCard : Card
+                        newCard =
+                            { card | questions = Array.set questionIndex newQuestion card.questions }
+                    in
+                    ( { model | cards = Array.set cardIndex newCard model.cards }
+                    , Cmd.none
+                    )
 
                 _ ->
                     ( model, Cmd.none )
 
         FillAnswer cardIndex questionIndex input ->
-            case input |> String.toInt of
-                Just inputInteger ->
-                    ( model, Cmd.none )
+            let
+                maybeCard : Maybe Card
+                maybeCard =
+                    Array.get cardIndex model.cards
+
+                maybeQuestion : Maybe Question
+                maybeQuestion =
+                    maybeCard |> Maybe.andThen (\card -> Array.get questionIndex card.questions)
+            in
+            case ( maybeQuestion, maybeCard ) of
+                ( Just question, Just card ) ->
+                    let
+                        newQuestion : Question
+                        newQuestion =
+                            { question | answer = input }
+
+                        newCard : Card
+                        newCard =
+                            { card | questions = Array.set questionIndex newQuestion card.questions }
+                    in
+                    ( { model | cards = Array.set cardIndex newCard model.cards }
+                    , Cmd.none
+                    )
 
                 _ ->
                     ( model, Cmd.none )
