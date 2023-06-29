@@ -165,7 +165,23 @@ view model =
 
 cardView : Int -> Card -> List (Html Msg)
 cardView cardIndex card =
-    indexedMap (questionView cardIndex) card.questions |> Array.toList
+    (indexedMap (questionView cardIndex) card.questions |> Array.toList)
+        ++ [ partlySum card
+           ]
+
+
+partlySum : Card -> Html Msg
+partlySum card =
+    let
+        maybeSum : Maybe Int
+        maybeSum =
+            card.questions |> Array.toList |> List.map score |> convertList |> Maybe.map List.sum
+    in
+    tr []
+        [ td [] []
+        , td [] [ text "Delsumma" ]
+        , td [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        ]
 
 
 questionView : Int -> Int -> Question -> Html Msg
@@ -196,7 +212,7 @@ answerInput : Int -> Int -> Question -> Html Msg
 answerInput cardIndex questionIndex question =
     input
         [ value question.answer
-        , onChange (FillAnswer cardIndex questionIndex)
+        , onInput (FillAnswer cardIndex questionIndex)
         ]
         []
 
@@ -204,3 +220,23 @@ answerInput cardIndex questionIndex question =
 onChange : (String -> msg) -> Html.Attribute msg
 onChange handler =
     on "change" <| Json.Decode.map handler <| Json.Decode.at [ "target", "value" ] Json.Decode.string
+
+
+convertList : List (Maybe Int) -> Maybe (List Int)
+convertList maybeList =
+    case maybeList of
+        [] ->
+            Just []
+
+        maybeValue :: rest ->
+            case maybeValue of
+                Just value ->
+                    case convertList rest of
+                        Just convertedList ->
+                            Just (value :: convertedList)
+
+                        Nothing ->
+                            Nothing
+
+                Nothing ->
+                    Nothing
