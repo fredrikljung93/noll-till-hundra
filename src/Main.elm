@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Array exposing (Array, indexedMap)
 import Browser
-import Html exposing (Html, button, div, input, table, td, text, tr)
+import Html exposing (Html, button, div, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (type_, value)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode
@@ -158,29 +158,60 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "0-100"
     , body =
-        [ table [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
+        [ table []
+            [ headerRow
+            , tbody [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
+            ]
+        , totalSum model
         ]
     }
+
+
+headerRow : Html Msg
+headerRow =
+    thead []
+        [ tr []
+            [ th [] [ Html.text "" ]
+            , th [] [ Html.text "Din gissning 0-100" ]
+            , th [] [ Html.text "Facit" ]
+            , th [] [ Html.text "Diff/Poäng" ]
+            ]
+        ]
 
 
 cardView : Int -> Card -> List (Html Msg)
 cardView cardIndex card =
     (indexedMap (questionView cardIndex) card.questions |> Array.toList)
-        ++ [ partlySum card
+        ++ [ partlySumView card
            ]
 
 
-partlySum : Card -> Html Msg
+partlySum : Card -> Maybe Int
 partlySum card =
-    let
-        maybeSum : Maybe Int
-        maybeSum =
-            card.questions |> Array.toList |> List.map score |> convertList |> Maybe.map List.sum
-    in
+    card.questions |> Array.toList |> List.map score |> convertList |> Maybe.map List.sum
+
+
+partlySumView : Card -> Html Msg
+partlySumView card =
     tr []
         [ td [] []
         , td [] [ text "Delsumma" ]
-        , td [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td [] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        ]
+
+
+totalSum : Model -> Html Msg
+totalSum model =
+    let
+        maybeSum : Maybe Int
+        maybeSum =
+            model.cards |> Array.toList |> List.map partlySum |> convertList |> Maybe.map List.sum
+    in
+    table []
+        [ tr []
+            [ td [] [ strong [] [ text "Total summa" ] ]
+            , td [] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
+            ]
         ]
 
 
