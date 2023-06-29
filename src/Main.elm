@@ -6,6 +6,31 @@ import Html exposing (Html, button, div, table, td, text, tr)
 import Html.Events exposing (onClick)
 
 
+init : ( Model, Cmd Msg )
+init =
+    ( initialModel, Cmd.none )
+
+
+main : Program () Model Msg
+main =
+    Browser.document
+        { init = \_ -> init
+        , view = view
+        , update = update
+        , subscriptions = always Sub.none
+        }
+
+
+
+-- MODEL
+
+
+initialModel : Model
+initialModel =
+    { cards = Array.initialize 3 (always emptyCard)
+    }
+
+
 type alias Card =
     { questions : Array Question
     }
@@ -32,15 +57,8 @@ emptyQuestion =
     Question (Just 100) (Just 100)
 
 
-initialModel : Model
-initialModel =
-    { cards = Array.initialize 3 (always emptyCard)
-    }
 
-
-init : ( Model, Cmd Msg )
-init =
-    ( initialModel, Cmd.none )
+-- UPDATE
 
 
 type Msg
@@ -56,6 +74,10 @@ update msg model =
 
         FillAnswer cardIndex questionIndex input ->
             ( model, Cmd.none )
+
+
+
+-- VIEW
 
 
 view : Model -> Browser.Document Msg
@@ -84,13 +106,3 @@ questionView cardIndex questionIndex question =
         , td [] [ question.answer |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         , td [] [ question.answer |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
-
-
-main : Program () Model Msg
-main =
-    Browser.document
-        { init = \_ -> init
-        , view = view
-        , update = update
-        , subscriptions = always Sub.none
-        }
