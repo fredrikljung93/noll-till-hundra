@@ -5494,7 +5494,21 @@ var $author$project$Main$FillAnswer = F3(
 	function (a, b, c) {
 		return {$: 'FillAnswer', a: a, b: b, c: c};
 	});
+var $author$project$Main$Guess = F3(
+	function (a, b, c) {
+		return {$: 'Guess', a: a, b: b, c: c};
+	});
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
+var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -5529,42 +5543,19 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$answerInput = F3(
-	function (cardIndex, questionIndex, question) {
-		return A2(
-			$elm$html$Html$input,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$value(question.answer),
-					$elm$html$Html$Events$onInput(
-					A2($author$project$Main$FillAnswer, cardIndex, questionIndex))
-				]),
-			_List_Nil);
-	});
-var $author$project$Main$Guess = F3(
-	function (a, b, c) {
-		return {$: 'Guess', a: a, b: b, c: c};
-	});
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Main$guessInput = F3(
-	function (cardIndex, questionIndex, question) {
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$numberInput = F2(
+	function (valueString, msg) {
 		return A2(
 			$elm$html$Html$input,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$value(question.guess),
-					$elm$html$Html$Events$onInput(
-					A2($author$project$Main$Guess, cardIndex, questionIndex)),
-					$elm$html$Html$Attributes$type_('number')
+					$elm$html$Html$Attributes$value(valueString),
+					$elm$html$Html$Events$onInput(msg),
+					$elm$html$Html$Attributes$type_('number'),
+					$elm$html$Html$Attributes$min('0'),
+					$elm$html$Html$Attributes$max('100')
 				]),
 			_List_Nil);
 	});
@@ -5589,14 +5580,20 @@ var $author$project$Main$questionView = F3(
 					_List_Nil,
 					_List_fromArray(
 						[
-							A3($author$project$Main$guessInput, cardIndex, questionIndex, question)
+							A2(
+							$author$project$Main$numberInput,
+							question.guess,
+							A2($author$project$Main$Guess, cardIndex, questionIndex))
 						])),
 					A2(
 					$elm$html$Html$td,
 					_List_Nil,
 					_List_fromArray(
 						[
-							A3($author$project$Main$answerInput, cardIndex, questionIndex, question)
+							A2(
+							$author$project$Main$numberInput,
+							question.answer,
+							A2($author$project$Main$FillAnswer, cardIndex, questionIndex))
 						])),
 					A2(
 					$elm$html$Html$td,

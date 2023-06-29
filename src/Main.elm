@@ -2,10 +2,9 @@ module Main exposing (main)
 
 import Array exposing (Array, indexedMap)
 import Browser
-import Html exposing (Html, button, div, input, strong, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (type_, value)
-import Html.Events exposing (on, onClick, onInput)
-import Json.Decode
+import Html.Events exposing (onInput)
 
 
 init : ( Model, Cmd Msg )
@@ -223,34 +222,22 @@ questionView cardIndex questionIndex question =
     in
     tr []
         [ td [] [ cardNumber |> String.fromInt |> text ]
-        , td [] [ guessInput cardIndex questionIndex question ]
-        , td [] [ answerInput cardIndex questionIndex question ]
+        , td [] [ numberInput question.guess (Guess cardIndex questionIndex) ]
+        , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) ]
         , td [] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
-guessInput : Int -> Int -> Question -> Html Msg
-guessInput cardIndex questionIndex question =
+numberInput : String -> (String -> Msg) -> Html Msg
+numberInput valueString msg =
     input
-        [ value question.guess
-        , onInput (Guess cardIndex questionIndex)
+        [ value valueString
+        , onInput msg
         , type_ "number"
+        , Html.Attributes.min "0"
+        , Html.Attributes.max "100"
         ]
         []
-
-
-answerInput : Int -> Int -> Question -> Html Msg
-answerInput cardIndex questionIndex question =
-    input
-        [ value question.answer
-        , onInput (FillAnswer cardIndex questionIndex)
-        ]
-        []
-
-
-onChange : (String -> msg) -> Html.Attribute msg
-onChange handler =
-    on "change" <| Json.Decode.map handler <| Json.Decode.at [ "target", "value" ] Json.Decode.string
 
 
 convertList : List (Maybe Int) -> Maybe (List Int)
