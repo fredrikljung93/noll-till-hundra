@@ -5543,6 +5543,8 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$numberInput = F2(
@@ -5555,7 +5557,9 @@ var $author$project$Main$numberInput = F2(
 					$elm$html$Html$Events$onInput(msg),
 					$elm$html$Html$Attributes$type_('number'),
 					$elm$html$Html$Attributes$min('0'),
-					$elm$html$Html$Attributes$max('100')
+					$elm$html$Html$Attributes$max('100'),
+					A2($elm$html$Html$Attributes$style, 'width', '100%'),
+					A2($elm$html$Html$Attributes$style, 'box-sizing', 'border-box')
 				]),
 			_List_Nil);
 	});
@@ -5635,6 +5639,12 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
+var $elm$html$Html$Attributes$colspan = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'colspan',
+		$elm$core$String$fromInt(n));
+};
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $author$project$Main$headerRow = A2(
@@ -5649,28 +5659,40 @@ var $author$project$Main$headerRow = A2(
 				[
 					A2(
 					$elm$html$Html$th,
-					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$colspan(1)
+						]),
 					_List_fromArray(
 						[
 							$elm$html$Html$text('')
 						])),
 					A2(
 					$elm$html$Html$th,
-					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$colspan(2)
+						]),
 					_List_fromArray(
 						[
 							$elm$html$Html$text('Din gissning 0-100')
 						])),
 					A2(
 					$elm$html$Html$th,
-					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$colspan(2)
+						]),
 					_List_fromArray(
 						[
 							$elm$html$Html$text('Facit')
 						])),
 					A2(
 					$elm$html$Html$th,
-					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$colspan(2)
+						]),
 					_List_fromArray(
 						[
 							$elm$html$Html$text('Diff/Poäng')

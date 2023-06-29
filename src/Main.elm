@@ -3,7 +3,7 @@ module Main exposing (main)
 import Array exposing (Array, indexedMap)
 import Browser
 import Html exposing (Html, input, strong, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (type_, value)
+import Html.Attributes exposing (colspan, type_, value)
 import Html.Events exposing (onInput)
 
 
@@ -170,10 +170,10 @@ headerRow : Html Msg
 headerRow =
     thead []
         [ tr []
-            [ th [] [ Html.text "" ]
-            , th [] [ Html.text "Din gissning 0-100" ]
-            , th [] [ Html.text "Facit" ]
-            , th [] [ Html.text "Diff/Poäng" ]
+            [ th [ colspan 1 ] [ Html.text "" ]
+            , th [ colspan 2 ] [ Html.text "Din gissning 0-100" ]
+            , th [ colspan 2 ] [ Html.text "Facit" ]
+            , th [ colspan 2 ] [ Html.text "Diff/Poäng" ]
             ]
         ]
 
@@ -236,6 +236,8 @@ numberInput valueString msg =
         , type_ "number"
         , Html.Attributes.min "0"
         , Html.Attributes.max "100"
+        , Html.Attributes.style "width" "100%"
+        , Html.Attributes.style "box-sizing" "border-box"
         ]
         []
 
