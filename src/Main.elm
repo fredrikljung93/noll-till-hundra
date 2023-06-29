@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Array exposing (Array, indexedMap)
 import Browser
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, button, div, table, td, text, tr)
 import Html.Events exposing (onClick)
 
 
@@ -29,7 +29,7 @@ emptyCard =
 
 emptyQuestion : Question
 emptyQuestion =
-    Question Nothing Nothing
+    Question (Just 100) (Just 100)
 
 
 initialModel : Model
@@ -62,15 +62,14 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "0-100"
     , body =
-        [ div [] (indexedMap cardView model.cards |> Array.toList)
+        [ table [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
         ]
     }
 
 
-cardView : Int -> Card -> Html Msg
+cardView : Int -> Card -> List (Html Msg)
 cardView cardIndex card =
-    div []
-        (indexedMap (questionView cardIndex) card.questions |> Array.toList)
+    indexedMap (questionView cardIndex) card.questions |> Array.toList
 
 
 questionView : Int -> Int -> Question -> Html Msg
@@ -79,8 +78,11 @@ questionView cardIndex questionIndex question =
         cardNumber =
             1 + (questionIndex + cardIndex * 7)
     in
-    div []
-        [ cardNumber |> String.fromInt |> text
+    tr []
+        [ td [] [ cardNumber |> String.fromInt |> text ]
+        , td [] [ question.guess |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td [] [ question.answer |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td [] [ question.answer |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
