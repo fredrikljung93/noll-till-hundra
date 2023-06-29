@@ -3,8 +3,9 @@ module Main exposing (main)
 import Array exposing (Array, indexedMap)
 import Browser
 import Html exposing (Html, button, div, input, table, td, text, tr)
-import Html.Attributes exposing (value)
-import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (type_, value)
+import Html.Events exposing (on, onClick, onInput)
+import Json.Decode
 
 
 init : ( Model, Cmd Msg )
@@ -38,8 +39,8 @@ type alias Card =
 
 
 type alias Question =
-    { guess : Maybe Int
-    , answer : Maybe Int
+    { guess : String
+    , answer : String
     }
 
 
@@ -55,14 +56,17 @@ emptyCard =
 
 emptyQuestion : Question
 emptyQuestion =
-    Question (Just 100) (Just 100)
+    Question "" ""
 
 
 score : Question -> Maybe Int
 score question =
-    case ( question.guess, question.answer ) of
+    case ( String.toInt question.guess, String.toInt question.answer ) of
         ( Just guessValue, Just answerValue ) ->
-            if guessValue == answerValue then
+            if not (numberInLegalRange guessValue && numberInLegalRange answerValue) then
+                Nothing
+
+            else if guessValue == answerValue then
                 Just -10
 
             else
@@ -70,6 +74,11 @@ score question =
 
         _ ->
             Nothing
+
+
+numberInLegalRange : Int -> Bool
+numberInLegalRange n =
+    n >= 0 && n <= 100
 
 
 
@@ -85,10 +94,20 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Guess cardIndex questionIndex input ->
-            ( model, Cmd.none )
+            case input |> String.toInt of
+                Just inputInteger ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         FillAnswer cardIndex questionIndex input ->
-            ( model, Cmd.none )
+            case input |> String.toInt of
+                Just inputInteger ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 
@@ -126,8 +145,9 @@ questionView cardIndex questionIndex question =
 guessInput : Int -> Int -> Question -> Html Msg
 guessInput cardIndex questionIndex question =
     input
-        [ value (question.guess |> Maybe.map String.fromInt |> Maybe.withDefault "")
+        [ value question.guess
         , onInput (Guess cardIndex questionIndex)
+        , type_ "number"
         ]
         []
 
@@ -135,7 +155,12 @@ guessInput cardIndex questionIndex question =
 answerInput : Int -> Int -> Question -> Html Msg
 answerInput cardIndex questionIndex question =
     input
-        [ value (question.answer |> Maybe.map String.fromInt |> Maybe.withDefault "")
-        , onInput (FillAnswer cardIndex questionIndex)
+        [ value question.answer
+        , onChange (FillAnswer cardIndex questionIndex)
         ]
         []
+
+
+onChange : (String -> msg) -> Html.Attribute msg
+onChange handler =
+    on "change" <| Json.Decode.map handler <| Json.Decode.at [ "target", "value" ] Json.Decode.string
