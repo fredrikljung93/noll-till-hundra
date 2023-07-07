@@ -5575,7 +5575,10 @@ var $author$project$Main$questionView = F3(
 		var cardNumber = 1 + (questionIndex + (cardIndex * 7));
 		return A2(
 			$elm$html$Html$tr,
-			_List_Nil,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'height', '3vh')
+				]),
 			_List_fromArray(
 				[
 					A2(
@@ -5648,6 +5651,7 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
+var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$colspan = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -5670,7 +5674,8 @@ var $author$project$Main$headerRow = A2(
 					$elm$html$Html$th,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$colspan(2)
+							$elm$html$Html$Attributes$colspan(2),
+							A2($elm$html$Html$Attributes$style, 'height', '')
 						]),
 					_List_fromArray(
 						[
@@ -5712,7 +5717,12 @@ var $author$project$Main$totalSum = function (model) {
 				$elm$core$Array$toList(model.cards))));
 	return A2(
 		$elm$html$Html$table,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
+				A2($elm$html$Html$Attributes$style, 'height', '100%'),
+				A2($elm$html$Html$Attributes$style, 'border-collapse', 'collapse')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -5722,7 +5732,10 @@ var $author$project$Main$totalSum = function (model) {
 					[
 						A2(
 						$elm$html$Html$td,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$colspan(2)
+							]),
 						_List_fromArray(
 							[
 								A2(
@@ -5735,7 +5748,10 @@ var $author$project$Main$totalSum = function (model) {
 							])),
 						A2(
 						$elm$html$Html$td,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$colspan(2)
+							]),
 						_List_fromArray(
 							[
 								A2(
@@ -5758,23 +5774,37 @@ var $author$project$Main$view = function (model) {
 		body: _List_fromArray(
 			[
 				A2(
-				$elm$html$Html$table,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'width', '100%'),
-						A2($elm$html$Html$Attributes$style, 'border-collapse', 'collapse')
+						A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+						A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+						A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+						A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+						A2($elm$html$Html$Attributes$style, 'flex-direction', 'column')
 					]),
 				_List_fromArray(
 					[
-						$author$project$Main$headerRow,
 						A2(
-						$elm$html$Html$tbody,
-						_List_Nil,
-						$elm$core$List$concat(
-							$elm$core$Array$toList(
-								A2($elm$core$Array$indexedMap, $author$project$Main$cardView, model.cards))))
-					])),
-				$author$project$Main$totalSum(model)
+						$elm$html$Html$table,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'width', '100%'),
+								A2($elm$html$Html$Attributes$style, 'height', '100%'),
+								A2($elm$html$Html$Attributes$style, 'border-collapse', 'collapse')
+							]),
+						_List_fromArray(
+							[
+								$author$project$Main$headerRow,
+								A2(
+								$elm$html$Html$tbody,
+								_List_Nil,
+								$elm$core$List$concat(
+									$elm$core$Array$toList(
+										A2($elm$core$Array$indexedMap, $author$project$Main$cardView, model.cards))))
+							])),
+						$author$project$Main$totalSum(model)
+					]))
 			]),
 		title: '0-100'
 	};

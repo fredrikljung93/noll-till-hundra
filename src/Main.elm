@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Array exposing (Array, indexedMap)
 import Browser
-import Html exposing (Html, input, strong, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (colspan, type_, value)
 import Html.Events exposing (onInput)
 
@@ -157,14 +157,23 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "0-100"
     , body =
-        [ table
-            [ Html.Attributes.style "width" "100%"
-            , Html.Attributes.style "border-collapse" "collapse"
+        [ div
+            [ Html.Attributes.style "height" "100vh"
+            , Html.Attributes.style "display" "flex"
+            , Html.Attributes.style "justify-content" "center"
+            , Html.Attributes.style "align-items" "center"
+            , Html.Attributes.style "flex-direction" "column"
             ]
-            [ headerRow
-            , tbody [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
+            [ table
+                [ Html.Attributes.style "width" "100%"
+                , Html.Attributes.style "height" "100%"
+                , Html.Attributes.style "border-collapse" "collapse"
+                ]
+                [ headerRow
+                , tbody [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
+                ]
+            , totalSum model
             ]
-        , totalSum model
         ]
     }
 
@@ -173,7 +182,7 @@ headerRow : Html Msg
 headerRow =
     thead []
         [ tr []
-            [ th [ colspan 2 ] [ Html.text "Din gissning 0-100" ]
+            [ th [ colspan 2, Html.Attributes.style "height" "" ] [ Html.text "Din gissning 0-100" ]
             , th [ colspan 1 ] [ Html.text "Facit" ]
             , th [ colspan 1 ] [ Html.text "Diff/Poäng" ]
             ]
@@ -208,10 +217,14 @@ totalSum model =
         maybeSum =
             model.cards |> Array.toList |> List.map partlySum |> convertList |> Maybe.map List.sum
     in
-    table []
+    table
+        [ Html.Attributes.style "width" "100%"
+        , Html.Attributes.style "height" "100%"
+        , Html.Attributes.style "border-collapse" "collapse"
+        ]
         [ tr []
-            [ td [] [ strong [] [ text "Total summa" ] ]
-            , td [] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
+            [ td [ colspan 2 ] [ strong [] [ text "Total summa" ] ]
+            , td [ colspan 2 ] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
             ]
         ]
 
@@ -222,7 +235,7 @@ questionView cardIndex questionIndex question =
         cardNumber =
             1 + (questionIndex + cardIndex * 7)
     in
-    tr []
+    tr [ Html.Attributes.style "height" "3vh" ]
         [ td [] [ cardNumber |> String.fromInt |> text ]
         , td [] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
