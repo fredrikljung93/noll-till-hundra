@@ -157,7 +157,10 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "0-100"
     , body =
-        [ table []
+        [ table
+            [ Html.Attributes.style "width" "100%"
+            , Html.Attributes.style "border-collapse" "collapse"
+            ]
             [ headerRow
             , tbody [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
             ]
@@ -170,10 +173,9 @@ headerRow : Html Msg
 headerRow =
     thead []
         [ tr []
-            [ th [ colspan 1 ] [ Html.text "" ]
-            , th [ colspan 2 ] [ Html.text "Din gissning 0-100" ]
-            , th [ colspan 2 ] [ Html.text "Facit" ]
-            , th [ colspan 2 ] [ Html.text "Diff/Poäng" ]
+            [ th [ colspan 2 ] [ Html.text "Din gissning 0-100" ]
+            , th [ colspan 1 ] [ Html.text "Facit" ]
+            , th [ colspan 1 ] [ Html.text "Diff/Poäng" ]
             ]
         ]
 
@@ -222,14 +224,14 @@ questionView cardIndex questionIndex question =
     in
     tr []
         [ td [] [ cardNumber |> String.fromInt |> text ]
-        , td [] [ numberInput question.guess (Guess cardIndex questionIndex) ]
-        , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) ]
+        , td [] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
+        , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
         , td [] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
-numberInput : String -> (String -> Msg) -> Html Msg
-numberInput valueString msg =
+numberInput : String -> (String -> Msg) -> Int -> Html Msg
+numberInput valueString msg tabIndex =
     input
         [ value valueString
         , onInput msg
@@ -238,6 +240,7 @@ numberInput valueString msg =
         , Html.Attributes.max "100"
         , Html.Attributes.style "width" "100%"
         , Html.Attributes.style "box-sizing" "border-box"
+        , Html.Attributes.tabindex tabIndex
         ]
         []
 

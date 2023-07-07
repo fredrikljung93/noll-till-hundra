@@ -5545,10 +5545,16 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$html$Html$Attributes$tabindex = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'tabIndex',
+		$elm$core$String$fromInt(n));
+};
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$numberInput = F2(
-	function (valueString, msg) {
+var $author$project$Main$numberInput = F3(
+	function (valueString, msg, tabIndex) {
 		return A2(
 			$elm$html$Html$input,
 			_List_fromArray(
@@ -5559,7 +5565,8 @@ var $author$project$Main$numberInput = F2(
 					$elm$html$Html$Attributes$min('0'),
 					$elm$html$Html$Attributes$max('100'),
 					A2($elm$html$Html$Attributes$style, 'width', '100%'),
-					A2($elm$html$Html$Attributes$style, 'box-sizing', 'border-box')
+					A2($elm$html$Html$Attributes$style, 'box-sizing', 'border-box'),
+					$elm$html$Html$Attributes$tabindex(tabIndex)
 				]),
 			_List_Nil);
 	});
@@ -5584,20 +5591,22 @@ var $author$project$Main$questionView = F3(
 					_List_Nil,
 					_List_fromArray(
 						[
-							A2(
+							A3(
 							$author$project$Main$numberInput,
 							question.guess,
-							A2($author$project$Main$Guess, cardIndex, questionIndex))
+							A2($author$project$Main$Guess, cardIndex, questionIndex),
+							(cardIndex * 10) + 1)
 						])),
 					A2(
 					$elm$html$Html$td,
 					_List_Nil,
 					_List_fromArray(
 						[
-							A2(
+							A3(
 							$author$project$Main$numberInput,
 							question.answer,
-							A2($author$project$Main$FillAnswer, cardIndex, questionIndex))
+							A2($author$project$Main$FillAnswer, cardIndex, questionIndex),
+							(cardIndex * 10) + 2)
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -5661,16 +5670,6 @@ var $author$project$Main$headerRow = A2(
 					$elm$html$Html$th,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$colspan(1)
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('')
-						])),
-					A2(
-					$elm$html$Html$th,
-					_List_fromArray(
-						[
 							$elm$html$Html$Attributes$colspan(2)
 						]),
 					_List_fromArray(
@@ -5681,7 +5680,7 @@ var $author$project$Main$headerRow = A2(
 					$elm$html$Html$th,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$colspan(2)
+							$elm$html$Html$Attributes$colspan(1)
 						]),
 					_List_fromArray(
 						[
@@ -5691,7 +5690,7 @@ var $author$project$Main$headerRow = A2(
 					$elm$html$Html$th,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$colspan(2)
+							$elm$html$Html$Attributes$colspan(1)
 						]),
 					_List_fromArray(
 						[
@@ -5760,7 +5759,11 @@ var $author$project$Main$view = function (model) {
 			[
 				A2(
 				$elm$html$Html$table,
-				_List_Nil,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'width', '100%'),
+						A2($elm$html$Html$Attributes$style, 'border-collapse', 'collapse')
+					]),
 				_List_fromArray(
 					[
 						$author$project$Main$headerRow,
