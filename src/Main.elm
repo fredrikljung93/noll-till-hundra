@@ -58,8 +58,8 @@ emptyQuestion =
     Question "" ""
 
 
-score : Question -> Maybe Int
-score question =
+calculateScore : Question -> Maybe Int
+calculateScore question =
     case ( String.toInt question.guess, String.toInt question.answer ) of
         ( Just guessValue, Just answerValue ) ->
             if not (numberInLegalRange guessValue && numberInLegalRange answerValue) then
@@ -217,7 +217,7 @@ cardView cardIndex card =
 
 partlySum : Card -> Maybe Int
 partlySum card =
-    card.questions |> Array.toList |> List.map score |> convertList |> Maybe.map List.sum
+    card.questions |> Array.toList |> List.map calculateScore |> convertList |> Maybe.map List.sum
 
 
 partlySumView : Card -> Html Msg
@@ -246,13 +246,29 @@ questionView cardIndex questionIndex question =
     let
         cardNumber =
             1 + (questionIndex + cardIndex * 7)
+
+        maybeScore : Maybe Int
+        maybeScore =
+            calculateScore question
+
+        answerColor =
+            maybeScore |> Maybe.map colorForScore |> Maybe.withDefault "white"
     in
     tr []
         [ td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right", Html.Attributes.style "font-weight" "bold" ] [ cardNumber |> String.fromInt |> text ]
         , td [ Html.Attributes.style "width" numberColumnWidth ] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
-        , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right" ] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right", Html.Attributes.style "background-color" answerColor ] [ maybeScore |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
+
+
+colorForScore : Int -> String
+colorForScore n =
+    "green"
+
+
+
+-- TODO
 
 
 numberInput : String -> (String -> Msg) -> Int -> Html Msg
