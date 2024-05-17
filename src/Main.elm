@@ -105,9 +105,17 @@ update msg model =
             case ( maybeQuestion, maybeCard ) of
                 ( Just question, Just card ) ->
                     let
+                        nextGuess : String
+                        nextGuess =
+                            if String.length input <= 3 then
+                                input
+
+                            else
+                                question.guess
+
                         newQuestion : Question
                         newQuestion =
-                            { question | guess = input }
+                            { question | guess = nextGuess }
 
                         newCard : Card
                         newCard =
@@ -133,9 +141,17 @@ update msg model =
             case ( maybeQuestion, maybeCard ) of
                 ( Just question, Just card ) ->
                     let
+                        nextAnswer : String
+                        nextAnswer =
+                            if String.length input <= 3 then
+                                input
+
+                            else
+                                question.answer
+
                         newQuestion : Question
                         newQuestion =
-                            { question | answer = input }
+                            { question | answer = nextAnswer }
 
                         newCard : Card
                         newCard =
