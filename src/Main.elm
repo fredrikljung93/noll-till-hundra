@@ -198,7 +198,7 @@ headerRow =
         [ tr []
             [ th [ colspan 2, Html.Attributes.style "height" "" ] [ Html.text "Din gissning 0-100" ]
             , th [ colspan 1 ] [ Html.text "Facit" ]
-            , th [ colspan 1 ] [ Html.text "Diff/Poäng" ]
+            , th [ colspan 1, Html.Attributes.style "width" "25%" ] [ Html.text "Diff/Poäng" ]
             ]
         ]
 
@@ -218,7 +218,7 @@ partlySum card =
 partlySumView : Card -> Html Msg
 partlySumView card =
     tr []
-        [ td [ Html.Attributes.style "font-size" "5em", Html.Attributes.colspan 3 ] [ text "Delsumma" ]
+        [ td [ Html.Attributes.style "font-size" "3em", Html.Attributes.colspan 3 ] [ text "Delsumma" ]
         , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "font-weight" "bold", Html.Attributes.style "text-align" "right" ] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
@@ -242,7 +242,7 @@ questionView cardIndex questionIndex question =
         cardNumber =
             1 + (questionIndex + cardIndex * 7)
     in
-    tr [ Html.Attributes.style "height" "3vh" ]
+    tr []
         [ td [ Html.Attributes.style "font-size" "5em" ] [ cardNumber |> String.fromInt |> text ]
         , td [] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
