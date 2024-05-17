@@ -169,9 +169,8 @@ view model =
                 , Html.Attributes.style "border-collapse" "collapse"
                 ]
                 [ headerRow
-                , tbody [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
+                , tbody [] ((indexedMap cardView model.cards |> Array.toList |> List.concat) ++ [ totalSum model ])
                 ]
-            , totalSum model
             ]
         ]
     }
@@ -203,8 +202,8 @@ partlySum card =
 partlySumView : Card -> Html Msg
 partlySumView card =
     tr []
-        [ td [ Html.Attributes.style "font-size" "5em", Html.Attributes.colspan 2 ] [ text "Delsumma" ]
-        , td [ Html.Attributes.style "font-size" "5em" ] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        [ td [ Html.Attributes.style "font-size" "5em", Html.Attributes.colspan 3 ] [ text "Delsumma" ]
+        , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "font-weight" "bold", Html.Attributes.style "text-align" "right" ] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
@@ -215,15 +214,9 @@ totalSum model =
         maybeSum =
             model.cards |> Array.toList |> List.map partlySum |> convertList |> Maybe.map List.sum
     in
-    table
-        [ Html.Attributes.style "width" "100%"
-        , Html.Attributes.style "height" "100%"
-        , Html.Attributes.style "border-collapse" "collapse"
-        ]
-        [ tr []
-            [ td [ colspan 2 ] [ strong [] [ text "Total summa" ] ]
-            , td [ colspan 2 ] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
-            ]
+    tr []
+        [ td [ colspan 3, Html.Attributes.style "font-size" "5em" ] [ strong [] [ text "Total summa" ] ]
+        , td [ colspan 1, Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right" ] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
         ]
 
 
@@ -237,7 +230,7 @@ questionView cardIndex questionIndex question =
         [ td [ Html.Attributes.style "font-size" "5em" ] [ cardNumber |> String.fromInt |> text ]
         , td [] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
-        , td [ Html.Attributes.style "font-size" "5em" ] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right" ] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
