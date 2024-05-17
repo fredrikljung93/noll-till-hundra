@@ -196,11 +196,16 @@ headerRow : Html Msg
 headerRow =
     thead [ Html.Attributes.style "font-size" "2em" ]
         [ tr []
-            [ th [ colspan 2, Html.Attributes.style "height" "" ] [ Html.text "Din gissning 0-100" ]
-            , th [ colspan 1 ] [ Html.text "Facit" ]
-            , th [ colspan 1, Html.Attributes.style "width" "25%" ] [ Html.text "Diff/Poäng" ]
+            [ th [ colspan 2 ] [ Html.text "Din gissning 0-100" ]
+            , th [ colspan 1, Html.Attributes.style "width" numberColumnWidth ] [ Html.text "Facit" ]
+            , th [ colspan 1, Html.Attributes.style "width" numberColumnWidth ] [ Html.text "Diff/Poäng" ]
             ]
         ]
+
+
+numberColumnWidth : String
+numberColumnWidth =
+    "30%"
 
 
 cardView : Int -> Card -> List (Html Msg)
@@ -232,7 +237,7 @@ totalSum model =
     in
     tr []
         [ td [ colspan 3, Html.Attributes.style "font-size" "5em" ] [ strong [] [ text "Total summa" ] ]
-        , td [ colspan 1, Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right" ] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
+        , td [ colspan 1, Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right", Html.Attributes.style "width" numberColumnWidth ] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
         ]
 
 
@@ -243,8 +248,8 @@ questionView cardIndex questionIndex question =
             1 + (questionIndex + cardIndex * 7)
     in
     tr []
-        [ td [ Html.Attributes.style "font-size" "5em" ] [ cardNumber |> String.fromInt |> text ]
-        , td [] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
+        [ td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right", Html.Attributes.style "font-weight" "bold" ] [ cardNumber |> String.fromInt |> text ]
+        , td [ Html.Attributes.style "width" numberColumnWidth ] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
         , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right" ] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
@@ -262,6 +267,7 @@ numberInput valueString msg tabIndex =
         , Html.Attributes.style "width" "100%"
         , Html.Attributes.style "box-sizing" "border-box"
         , Html.Attributes.style "font-size" "5em"
+        , Html.Attributes.style "text-align" "right"
         , Html.Attributes.tabindex tabIndex
         ]
         []
