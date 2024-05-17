@@ -160,7 +160,6 @@ view model =
         [ div
             [ Html.Attributes.style "height" "100vh"
             , Html.Attributes.style "display" "flex"
-            , Html.Attributes.style "justify-content" "center"
             , Html.Attributes.style "align-items" "center"
             , Html.Attributes.style "flex-direction" "column"
             ]
@@ -180,7 +179,7 @@ view model =
 
 headerRow : Html Msg
 headerRow =
-    thead []
+    thead [ Html.Attributes.style "font-size" "2em" ]
         [ tr []
             [ th [ colspan 2, Html.Attributes.style "height" "" ] [ Html.text "Din gissning 0-100" ]
             , th [ colspan 1 ] [ Html.text "Facit" ]
@@ -204,9 +203,8 @@ partlySum card =
 partlySumView : Card -> Html Msg
 partlySumView card =
     tr []
-        [ td [] []
-        , td [] [ text "Delsumma" ]
-        , td [] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        [ td [ Html.Attributes.style "font-size" "5em", Html.Attributes.colspan 2 ] [ text "Delsumma" ]
+        , td [ Html.Attributes.style "font-size" "5em" ] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
@@ -236,10 +234,10 @@ questionView cardIndex questionIndex question =
             1 + (questionIndex + cardIndex * 7)
     in
     tr [ Html.Attributes.style "height" "3vh" ]
-        [ td [] [ cardNumber |> String.fromInt |> text ]
+        [ td [ Html.Attributes.style "font-size" "5em" ] [ cardNumber |> String.fromInt |> text ]
         , td [] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
-        , td [] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td [ Html.Attributes.style "font-size" "5em" ] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
@@ -253,6 +251,7 @@ numberInput valueString msg tabIndex =
         , Html.Attributes.max "100"
         , Html.Attributes.style "width" "100%"
         , Html.Attributes.style "box-sizing" "border-box"
+        , Html.Attributes.style "font-size" "5em"
         , Html.Attributes.tabindex tabIndex
         ]
         []
