@@ -242,6 +242,7 @@ numberInput valueString msg tabIndex =
         , type_ "number"
         , Html.Attributes.min "0"
         , Html.Attributes.max "100"
+        , Html.Attributes.maxlength 3
         , Html.Attributes.style "width" "100%"
         , Html.Attributes.style "box-sizing" "border-box"
         , Html.Attributes.style "font-size" "5em"
