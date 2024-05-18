@@ -361,7 +361,11 @@ colorForScore n =
         blue =
             0
     in
-    Css.rgb red green blue
+    if n == -10 then
+        Css.rgba 0 180 0 100
+
+    else
+        Css.rgba red green blue 0.7
 
 
 
