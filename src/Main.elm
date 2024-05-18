@@ -217,7 +217,11 @@ cardView cardIndex card =
 
 partlySum : Card -> Maybe Int
 partlySum card =
-    card.questions |> Array.toList |> List.map calculateScore |> convertList |> Maybe.map List.sum
+    card.questions
+        |> Array.toList
+        |> List.map calculateScore
+        |> convertList
+        |> Maybe.map List.sum
 
 
 partlySumView : Card -> Html Msg
@@ -296,14 +300,9 @@ convertList maybeList =
             Just []
 
         maybeValue :: rest ->
-            case maybeValue of
-                Just value ->
-                    case convertList rest of
-                        Just convertedList ->
-                            Just (value :: convertedList)
-
-                        Nothing ->
-                            Nothing
-
-                Nothing ->
-                    Nothing
+            maybeValue
+                |> Maybe.andThen
+                    (\value ->
+                        convertList rest
+                            |> Maybe.map (\convertedList -> value :: convertedList)
+                    )
