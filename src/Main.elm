@@ -197,8 +197,16 @@ headerRow =
     thead [ Html.Attributes.style "font-size" "2em" ]
         [ tr []
             [ th [ colspan 2 ] [ Html.text "Din gissning 0-100" ]
-            , th [ colspan 1, Html.Attributes.style "width" numberColumnWidth ] [ Html.text "Facit" ]
-            , th [ colspan 1, Html.Attributes.style "width" numberColumnWidth ] [ Html.text "Diff/Poäng" ]
+            , th
+                [ colspan 1
+                , Html.Attributes.style "width" numberColumnWidth
+                ]
+                [ Html.text "Facit" ]
+            , th
+                [ colspan 1
+                , Html.Attributes.style "width" numberColumnWidth
+                ]
+                [ Html.text "Diff/Poäng" ]
             ]
         ]
 
@@ -227,8 +235,17 @@ partlySum card =
 partlySumView : Card -> Html Msg
 partlySumView card =
     tr []
-        [ td [ Html.Attributes.style "font-size" "3em", Html.Attributes.colspan 3 ] [ text "Delsumma" ]
-        , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "font-weight" "bold", Html.Attributes.style "text-align" "right" ] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        [ td
+            [ Html.Attributes.style "font-size" "3em"
+            , Html.Attributes.colspan 3
+            ]
+            [ text "Delsumma" ]
+        , td
+            [ Html.Attributes.style "font-size" "5em"
+            , Html.Attributes.style "font-weight" "bold"
+            , Html.Attributes.style "text-align" "right"
+            ]
+            [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
@@ -237,11 +254,31 @@ totalSum model =
     let
         maybeSum : Maybe Int
         maybeSum =
-            model.cards |> Array.toList |> List.map partlySum |> convertList |> Maybe.map List.sum
+            model.cards
+                |> Array.toList
+                |> List.map partlySum
+                |> convertList
+                |> Maybe.map List.sum
     in
     tr []
-        [ td [ colspan 3, Html.Attributes.style "font-size" "5em" ] [ strong [] [ text "Total summa" ] ]
-        , td [ colspan 1, Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right", Html.Attributes.style "width" numberColumnWidth ] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
+        [ td
+            [ colspan 3
+            , Html.Attributes.style "font-size" "5em"
+            ]
+            [ strong [] [ text "Total summa" ] ]
+        , td
+            [ colspan 1
+            , Html.Attributes.style "font-size" "5em"
+            , Html.Attributes.style "text-align" "right"
+            , Html.Attributes.style "width" numberColumnWidth
+            ]
+            [ strong []
+                [ maybeSum
+                    |> Maybe.map String.fromInt
+                    |> Maybe.withDefault ""
+                    |> text
+                ]
+            ]
         ]
 
 
@@ -259,10 +296,22 @@ questionView cardIndex questionIndex question =
             maybeScore |> Maybe.map colorForScore |> Maybe.withDefault "white"
     in
     tr []
-        [ td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right", Html.Attributes.style "font-weight" "bold" ] [ cardNumber |> String.fromInt |> text ]
-        , td [ Html.Attributes.style "width" numberColumnWidth ] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
+        [ td
+            [ Html.Attributes.style "font-size" "5em"
+            , Html.Attributes.style "text-align" "right"
+            , Html.Attributes.style "font-weight" "bold"
+            ]
+            [ cardNumber |> String.fromInt |> text ]
+        , td [ Html.Attributes.style "width" numberColumnWidth ]
+            [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1)
+            ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
-        , td [ Html.Attributes.style "font-size" "5em", Html.Attributes.style "text-align" "right", Html.Attributes.style "background-color" answerColor ] [ maybeScore |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td
+            [ Html.Attributes.style "font-size" "5em"
+            , Html.Attributes.style "text-align" "right"
+            , Html.Attributes.style "background-color" answerColor
+            ]
+            [ maybeScore |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
