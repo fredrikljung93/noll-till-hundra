@@ -91,6 +91,11 @@ numberInLegalRange n =
     n >= 0 && n <= 100
 
 
+isLegalNumber : String -> Bool
+isLegalNumber s =
+    String.toInt s |> Maybe.map numberInLegalRange |> Maybe.withDefault False
+
+
 
 -- UPDATE
 
@@ -369,12 +374,16 @@ colorForScore n =
         Css.rgba red green blue 0.7
 
 
-
--- TODO
-
-
 numberInput : String -> (String -> Msg) -> Int -> Html Msg
 numberInput valueString msg tabIndex =
+    let
+        textColor =
+            if valueString == "" || isLegalNumber valueString then
+                Css.rgb 0 0 0
+
+            else
+                Css.rgb 220 0 0
+    in
     input
         [ value valueString
         , onInput msg
@@ -387,6 +396,7 @@ numberInput valueString msg tabIndex =
             , Css.boxSizing Css.borderBox
             , Css.fontSize (Css.em 5)
             , Css.textAlign Css.right
+            , Css.color textColor
             ]
         , Attributes.tabindex tabIndex
         ]
