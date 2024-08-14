@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html --public-url /noll-till-hundra/"
+    "build": "parcel build index.html ./ --no-cache"
   },
   "devDependencies": {
     "@parcel/transformer-elm": "^2.5.0",
