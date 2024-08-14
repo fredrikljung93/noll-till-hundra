@@ -1,5 +1,7 @@
-This is a minimal boilerplate for an Elm app with Parcel.
+# Noll till hundra
 
-Run `npm install` and `npm start` to start a development server.
+Web application to correct "Noll till hundra" score blocks by calculating the score.
 
-Credit to https://gist.github.com/sch/05ad3bbcdb95131010da3e3121b9ae67
+Noll till hundra (Zero to hundred) is a trivia game where the anser is always a number between 0 and 100 by Swedish [MIG](https://playmig.com/).
+
+Elm app built with Parcel.
