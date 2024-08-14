@@ -184,7 +184,6 @@ styledView model =
             , Css.displayFlex
             , Css.alignItems Css.center
             , Css.flexDirection Css.column
-            , Css.backgroundColor (Css.color (Css.rgb 0 0 0))
             ]
         ]
         [ table
