@@ -2,9 +2,11 @@ module Main exposing (main)
 
 import Array exposing (Array, indexedMap)
 import Browser
-import Html exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (colspan, type_, value)
-import Html.Events exposing (onInput)
+import Css
+import Html.Styled exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
+import Html.Styled.Attributes as Attributes exposing (colspan, type_, value)
+import Html.Styled.Events as Events exposing (onInput)
+import String exposing (toInt)
 
 
 init : ( Model, Cmd Msg )
@@ -16,10 +18,19 @@ main : Program () Model Msg
 main =
     Browser.document
         { init = \_ -> init
-        , view = view
+        , view = document
         , update = update
         , subscriptions = always Sub.none
         }
+
+
+document : Model -> Browser.Document Msg
+document model =
+    { title = "My Elm App"
+    , body =
+        [ Html.Styled.toUnstyled <| styledView model
+        ]
+    }
 
 
 
@@ -58,8 +69,8 @@ emptyQuestion =
     Question "" ""
 
 
-score : Question -> Maybe Int
-score question =
+calculateScore : Question -> Maybe Int
+calculateScore question =
     case ( String.toInt question.guess, String.toInt question.answer ) of
         ( Just guessValue, Just answerValue ) ->
             if not (numberInLegalRange guessValue && numberInLegalRange answerValue) then
@@ -105,9 +116,17 @@ update msg model =
             case ( maybeQuestion, maybeCard ) of
                 ( Just question, Just card ) ->
                     let
+                        nextGuess : String
+                        nextGuess =
+                            if String.length input <= 3 then
+                                input
+
+                            else
+                                question.guess
+
                         newQuestion : Question
                         newQuestion =
-                            { question | guess = input }
+                            { question | guess = nextGuess }
 
                         newCard : Card
                         newCard =
@@ -133,9 +152,17 @@ update msg model =
             case ( maybeQuestion, maybeCard ) of
                 ( Just question, Just card ) ->
                     let
+                        nextAnswer : String
+                        nextAnswer =
+                            if String.length input <= 3 then
+                                input
+
+                            else
+                                question.answer
+
                         newQuestion : Question
                         newQuestion =
-                            { question | answer = input }
+                            { question | answer = nextAnswer }
 
                         newCard : Card
                         newCard =
@@ -149,44 +176,51 @@ update msg model =
                     ( model, Cmd.none )
 
 
-
--- VIEW
-
-
-view : Model -> Browser.Document Msg
-view model =
-    { title = "0-100"
-    , body =
-        [ div
-            [ Html.Attributes.style "height" "100vh"
-            , Html.Attributes.style "display" "flex"
-            , Html.Attributes.style "justify-content" "center"
-            , Html.Attributes.style "align-items" "center"
-            , Html.Attributes.style "flex-direction" "column"
-            ]
-            [ table
-                [ Html.Attributes.style "width" "100%"
-                , Html.Attributes.style "height" "100%"
-                , Html.Attributes.style "border-collapse" "collapse"
-                ]
-                [ headerRow
-                , tbody [] (indexedMap cardView model.cards |> Array.toList |> List.concat)
-                ]
-            , totalSum model
+styledView : Model -> Html Msg
+styledView model =
+    div
+        [ Attributes.css
+            [ Css.height (Css.vh 100)
+            , Css.displayFlex
+            , Css.alignItems Css.center
+            , Css.flexDirection Css.column
             ]
         ]
-    }
+        [ table
+            [ Attributes.css
+                [ Css.width (Css.pct 100)
+                , Css.height (Css.pct 100)
+                , Css.borderCollapse Css.collapse
+                ]
+            ]
+            [ headerRow
+            , tbody [] ((indexedMap cardView model.cards |> Array.toList |> List.concat) ++ [ totalSum model ])
+            ]
+        ]
 
 
 headerRow : Html Msg
 headerRow =
-    thead []
+    thead [ Attributes.css [ Css.fontSize (Css.em 2) ] ]
         [ tr []
-            [ th [ colspan 2, Html.Attributes.style "height" "" ] [ Html.text "Din gissning 0-100" ]
-            , th [ colspan 1 ] [ Html.text "Facit" ]
-            , th [ colspan 1 ] [ Html.text "Diff/Poäng" ]
+            [ th [ colspan 2 ] [ text "Din gissning 0-100" ]
+            , th
+                [ colspan 1
+                , Attributes.css [ Css.width numberColumnWidth ]
+                ]
+                [ text "Facit" ]
+            , th
+                [ colspan 1
+                , Attributes.css [ Css.width numberColumnWidth ]
+                ]
+                [ text "Diff/Poäng" ]
             ]
         ]
+
+
+numberColumnWidth : Css.Pct
+numberColumnWidth =
+    Css.pct 30
 
 
 cardView : Int -> Card -> List (Html Msg)
@@ -198,15 +232,25 @@ cardView cardIndex card =
 
 partlySum : Card -> Maybe Int
 partlySum card =
-    card.questions |> Array.toList |> List.map score |> convertList |> Maybe.map List.sum
+    card.questions
+        |> Array.toList
+        |> List.map calculateScore
+        |> convertList
+        |> Maybe.map List.sum
 
 
 partlySumView : Card -> Html Msg
 partlySumView card =
     tr []
-        [ td [] []
-        , td [] [ text "Delsumma" ]
-        , td [] [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        [ td
+            [ Attributes.css [ Css.fontSize (Css.em 3) ]
+            , Attributes.colspan 3
+            ]
+            [ text "Delsumma" ]
+        , td
+            [ Attributes.css [ Css.fontSize (Css.em 3), Css.fontWeight Css.bold, Css.textAlign Css.right ]
+            ]
+            [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
 
 
@@ -215,16 +259,32 @@ totalSum model =
     let
         maybeSum : Maybe Int
         maybeSum =
-            model.cards |> Array.toList |> List.map partlySum |> convertList |> Maybe.map List.sum
+            model.cards
+                |> Array.toList
+                |> List.map partlySum
+                |> convertList
+                |> Maybe.map List.sum
     in
-    table
-        [ Html.Attributes.style "width" "100%"
-        , Html.Attributes.style "height" "100%"
-        , Html.Attributes.style "border-collapse" "collapse"
-        ]
-        [ tr []
-            [ td [ colspan 2 ] [ strong [] [ text "Total summa" ] ]
-            , td [ colspan 2 ] [ strong [] [ maybeSum |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ] ]
+    tr []
+        [ td
+            [ colspan 3
+            , Attributes.css [ Css.fontSize (Css.em 5) ]
+            ]
+            [ strong [] [ text "Total summa" ] ]
+        , td
+            [ colspan 1
+            , Attributes.css
+                [ Css.fontSize (Css.em 5)
+                , Css.textAlign Css.right
+                , Css.width numberColumnWidth
+                ]
+            ]
+            [ strong []
+                [ maybeSum
+                    |> Maybe.map String.fromInt
+                    |> Maybe.withDefault ""
+                    |> text
+                ]
             ]
         ]
 
@@ -234,13 +294,82 @@ questionView cardIndex questionIndex question =
     let
         cardNumber =
             1 + (questionIndex + cardIndex * 7)
+
+        maybeScore : Maybe Int
+        maybeScore =
+            calculateScore question
+
+        answerColor =
+            maybeScore |> Maybe.map colorForScore |> Maybe.withDefault (Css.rgb 0 0 0)
     in
-    tr [ Html.Attributes.style "height" "3vh" ]
-        [ td [] [ cardNumber |> String.fromInt |> text ]
-        , td [] [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1) ]
+    tr []
+        [ td
+            [ Attributes.css
+                [ Css.fontSize (Css.em 5)
+                , Css.textAlign Css.right
+                , Css.fontWeight Css.bold
+                ]
+            ]
+            [ cardNumber |> String.fromInt |> text ]
+        , td [ Attributes.css [ Css.width numberColumnWidth ] ]
+            [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1)
+            ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
-        , td [] [ score question |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+        , td
+            [ Attributes.css
+                [ Css.fontSize (Css.em 5)
+                , Css.textAlign Css.right
+                , Css.color answerColor
+                ]
+            ]
+            [ maybeScore |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
         ]
+
+
+colorForScore n =
+    let
+        clamp min max val =
+            if val < min then
+                min
+
+            else if val > max then
+                max
+
+            else
+                val
+
+        nClamped =
+            clamp 0 100 n
+
+        red : Int
+        red =
+            if nClamped <= 50 then
+                round (255 * (toFloat nClamped / 50))
+
+            else
+                255
+
+        green : Int
+        green =
+            if nClamped <= 50 then
+                255
+
+            else
+                round (255 * (1 - (toFloat (nClamped - 50) / 50)))
+
+        blue : Int
+        blue =
+            0
+    in
+    if n == -10 then
+        Css.rgba 0 180 0 100
+
+    else
+        Css.rgba red green blue 0.7
+
+
+
+-- TODO
 
 
 numberInput : String -> (String -> Msg) -> Int -> Html Msg
@@ -249,11 +378,16 @@ numberInput valueString msg tabIndex =
         [ value valueString
         , onInput msg
         , type_ "number"
-        , Html.Attributes.min "0"
-        , Html.Attributes.max "100"
-        , Html.Attributes.style "width" "100%"
-        , Html.Attributes.style "box-sizing" "border-box"
-        , Html.Attributes.tabindex tabIndex
+        , Attributes.min "0"
+        , Attributes.max "100"
+        , Attributes.maxlength 3
+        , Attributes.css
+            [ Css.width (Css.pct 100)
+            , Css.boxSizing Css.borderBox
+            , Css.fontSize (Css.em 5)
+            , Css.textAlign Css.right
+            ]
+        , Attributes.tabindex tabIndex
         ]
         []
 
@@ -265,14 +399,9 @@ convertList maybeList =
             Just []
 
         maybeValue :: rest ->
-            case maybeValue of
-                Just value ->
-                    case convertList rest of
-                        Just convertedList ->
-                            Just (value :: convertedList)
-
-                        Nothing ->
-                            Nothing
-
-                Nothing ->
-                    Nothing
+            maybeValue
+                |> Maybe.andThen
+                    (\value ->
+                        convertList rest
+                            |> Maybe.map (\convertedList -> value :: convertedList)
+                    )
