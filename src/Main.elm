@@ -26,7 +26,7 @@ main =
 
 document : Model -> Browser.Document Msg
 document model =
-    { title = "My Elm App"
+    { title = "Noll till hundra"
     , body =
         [ Html.Styled.toUnstyled <| styledView model
         ]
