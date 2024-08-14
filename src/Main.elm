@@ -320,6 +320,7 @@ questionView cardIndex questionIndex question =
                 [ Css.fontSize (Css.em 5)
                 , Css.textAlign Css.right
                 , Css.color answerColor
+                , Css.textShadow4 (Css.px 1) (Css.px 0) (Css.px 0) (Css.rgb 0 0 0)
                 ]
             ]
             [ maybeScore |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
