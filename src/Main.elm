@@ -246,16 +246,18 @@ partlySum card =
 
 partlySumView : Card -> Html Msg
 partlySumView card =
-    tr []
+    tr
+        [ Attributes.css [ Css.minHeight (Css.em 7), Css.height (Css.em 7) ]
+        ]
         [ td
-            [ Attributes.css [ Css.fontSize (Css.em 5) ]
+            [ Attributes.css [ Css.fontSize (Css.em 2), Css.textAlign Css.right ]
             , Attributes.colspan 3
             ]
             [ text "Delsumma" ]
         , td
             [ Attributes.css [ Css.fontSize (Css.em 5), Css.textAlign Css.right ]
             ]
-            [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault "" |> text ]
+            [ partlySum card |> Maybe.map String.fromInt |> Maybe.withDefault " " |> text ]
         ]
 
 
@@ -270,10 +272,12 @@ totalSum model =
                 |> convertList
                 |> Maybe.map List.sum
     in
-    tr []
+    tr
+        [ Attributes.css [ Css.minHeight (Css.em 7), Css.height (Css.em 7) ]
+        ]
         [ td
             [ colspan 3
-            , Attributes.css [ Css.fontSize (Css.em 5) ]
+            , Attributes.css [ Css.fontSize (Css.em 3), Css.textAlign Css.right ]
             ]
             [ strong [] [ text "Total summa" ] ]
         , td
