@@ -5,8 +5,7 @@ import Browser
 import Css
 import Html.Styled exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Styled.Attributes as Attributes exposing (colspan, type_, value)
-import Html.Styled.Events as Events exposing (onInput)
-import String exposing (toInt)
+import Html.Styled.Events exposing (onInput)
 
 
 init : ( Model, Cmd Msg )
@@ -196,6 +195,7 @@ styledView model =
                 [ Css.width (Css.pct 100)
                 , Css.height (Css.pct 100)
                 , Css.borderCollapse Css.collapse
+                , Css.maxWidth (Css.pct 100)
                 ]
             ]
             [ headerRow
@@ -206,26 +206,60 @@ styledView model =
 
 headerRow : Html Msg
 headerRow =
-    thead [ Attributes.css [ Css.fontSize (Css.em 2) ] ]
-        [ tr []
-            [ th [ colspan 2 ] [ text "Din gissning 0-100" ]
+    thead
+        []
+        [ tr
+            [ Attributes.css
+                [ Css.minHeight (Css.em 4)
+                , Css.height (Css.em 4)
+                , Css.maxHeight (Css.em 4)
+                , Css.backgroundColor lightGray
+                , Css.fontSize (Css.em 2)
+                ]
+            ]
+            [ th [ Attributes.css [ yourGuessColspan2Width ], colspan 2 ] [ text "Ditt svar 0-100" ]
             , th
                 [ colspan 1
-                , Attributes.css [ Css.width numberColumnWidth ]
+                , Attributes.css [ correctAnswerWidth ]
                 ]
                 [ text "Facit" ]
             , th
                 [ colspan 1
-                , Attributes.css [ Css.width numberColumnWidth ]
+                , Attributes.css [ diffWidth ]
                 ]
                 [ text "Diff/Poäng" ]
             ]
         ]
 
 
-numberColumnWidth : Css.Pct
+cardNumberWidth : Css.Style
+cardNumberWidth =
+    Css.important (Css.width (Css.vw 10))
+
+
+yourGuessColspan2Width : Css.Style
+yourGuessColspan2Width =
+    Css.width (Css.vw 40)
+
+
+guessInputWidth : Css.Style
+guessInputWidth =
+    Css.important numberColumnWidth
+
+
+correctAnswerWidth : Css.Style
+correctAnswerWidth =
+    numberColumnWidth
+
+
+diffWidth : Css.Style
+diffWidth =
+    numberColumnWidth
+
+
+numberColumnWidth : Css.Style
 numberColumnWidth =
-    Css.pct 30
+    Css.width (Css.vw 30)
 
 
 cardView : Int -> Card -> List (Html Msg)
@@ -247,7 +281,12 @@ partlySum card =
 partlySumView : Card -> Html Msg
 partlySumView card =
     tr
-        [ Attributes.css [ Css.minHeight (Css.em 7), Css.height (Css.em 7) ]
+        [ Attributes.css
+            [ Css.minHeight (Css.em 7)
+            , Css.height (Css.em 7)
+            , Css.maxHeight (Css.em 7)
+            , Css.backgroundColor lightGray
+            ]
         ]
         [ td
             [ Attributes.css [ Css.fontSize (Css.em 2), Css.textAlign Css.right ]
@@ -285,7 +324,7 @@ totalSum model =
             , Attributes.css
                 [ Css.fontSize (Css.em 5)
                 , Css.textAlign Css.right
-                , Css.width numberColumnWidth
+                , diffWidth
                 ]
             ]
             [ strong []
@@ -298,9 +337,27 @@ totalSum model =
         ]
 
 
+lightGray : Css.Color
+lightGray =
+    Css.rgb 220 220 220
+
+
+backgroundColorForCard : Int -> Css.Color
+backgroundColorForCard cardNumber =
+    if
+        (cardNumber >= 9 && cardNumber < 14 && modBy 2 cardNumber == 1)
+            || ((cardNumber < 8 || cardNumber > 14) && modBy 2 cardNumber == 0)
+    then
+        Css.rgb 220 220 220
+
+    else
+        Css.rgb 255 255 255
+
+
 questionView : Int -> Int -> Question -> Html Msg
 questionView cardIndex questionIndex question =
     let
+        cardNumber : Int
         cardNumber =
             1 + (questionIndex + cardIndex * 7)
 
@@ -311,16 +368,17 @@ questionView cardIndex questionIndex question =
         answerColor =
             maybeScore |> Maybe.map colorForScore |> Maybe.withDefault (Css.rgb 0 0 0)
     in
-    tr []
+    tr [ Attributes.css [ Css.backgroundColor (backgroundColorForCard cardNumber) ] ]
         [ td
             [ Attributes.css
                 [ Css.fontSize (Css.em 5)
                 , Css.textAlign Css.right
                 , Css.fontWeight Css.bold
+                , cardNumberWidth
                 ]
             ]
             [ cardNumber |> String.fromInt |> text ]
-        , td [ Attributes.css [ Css.width numberColumnWidth ] ]
+        , td [ Attributes.css [ guessInputWidth ] ]
             [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1)
             ]
         , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
@@ -401,6 +459,8 @@ numberInput valueString msg tabIndex =
             , Css.fontSize (Css.em 5)
             , Css.textAlign Css.right
             , Css.color textColor
+            , Css.backgroundColor (Css.rgba 0 0 0 0)
+            , Css.borderWidth (Css.px 0)
             ]
         , Attributes.tabindex tabIndex
         ]
