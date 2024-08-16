@@ -3,6 +3,7 @@ module Main exposing (main)
 import Array exposing (Array, indexedMap)
 import Browser
 import Css
+import Css.Global
 import Html.Styled exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Styled.Attributes as Attributes exposing (colspan, type_, value)
 import Html.Styled.Events exposing (onInput)
@@ -25,10 +26,70 @@ main =
 
 document : Model -> Browser.Document Msg
 document model =
+    let
+        themeProperties =
+            propertiesForTheme model.theme
+    in
     { title = "Noll till hundra"
     , body =
-        [ Html.Styled.toUnstyled <| styledView model
+        [ Html.Styled.toUnstyled <| styledView model themeProperties
+        , Html.Styled.toUnstyled <| bodyStyles themeProperties
         ]
+    }
+
+
+bodyStyles : ThemeProperties -> Html msg
+bodyStyles themeProperties =
+    Css.Global.global
+        [ Css.Global.body
+            [ Css.backgroundColor themeProperties.backgroundColor
+            , Css.color themeProperties.textColor
+            ]
+        ]
+
+
+
+-- THEMES
+
+
+propertiesForTheme : Theme -> ThemeProperties
+propertiesForTheme theme =
+    case theme of
+        Light ->
+            lightTheme
+
+        Dark ->
+            darkTheme
+
+
+type Theme
+    = Light
+    | Dark
+
+
+type alias ThemeProperties =
+    { backgroundColor : Css.Color
+    , primaryColor : Css.Color
+    , textColor : Css.Color
+    , errorTextColor : Css.Color
+    }
+
+
+lightTheme : ThemeProperties
+lightTheme =
+    { backgroundColor = Css.rgb 255 255 255
+    , primaryColor = Css.rgb 220 220 220
+    , textColor = Css.rgb 0 0 0
+    , errorTextColor = Css.rgb 220 0 0
+    }
+
+
+darkTheme : ThemeProperties
+darkTheme =
+    { backgroundColor = Css.rgb 0 0 0
+    , primaryColor = Css.rgb 50 50 50
+    , textColor = Css.rgb 200 200 200
+    , errorTextColor = Css.rgb 220 0 0
     }
 
 
@@ -39,6 +100,7 @@ document model =
 initialModel : Model
 initialModel =
     { cards = Array.initialize 3 (always emptyCard)
+    , theme = Dark
     }
 
 
@@ -55,6 +117,7 @@ type alias Question =
 
 type alias Model =
     { cards : Array Card
+    , theme : Theme
     }
 
 
@@ -180,8 +243,8 @@ update msg model =
                     ( model, Cmd.none )
 
 
-styledView : Model -> Html Msg
-styledView model =
+styledView : Model -> ThemeProperties -> Html Msg
+styledView model themeProperties =
     div
         [ Attributes.css
             [ Css.height (Css.vh 100)
@@ -198,14 +261,14 @@ styledView model =
                 , Css.maxWidth (Css.pct 100)
                 ]
             ]
-            [ headerRow
-            , tbody [] ((indexedMap cardView model.cards |> Array.toList |> List.concat) ++ [ totalSum model ])
+            [ headerRow themeProperties
+            , tbody [] ((indexedMap (cardView themeProperties) model.cards |> Array.toList |> List.concat) ++ [ totalSum model ])
             ]
         ]
 
 
-headerRow : Html Msg
-headerRow =
+headerRow : ThemeProperties -> Html Msg
+headerRow themeProperties =
     thead
         []
         [ tr
@@ -213,7 +276,7 @@ headerRow =
                 [ Css.minHeight (Css.em 4)
                 , Css.height (Css.em 4)
                 , Css.maxHeight (Css.em 4)
-                , Css.backgroundColor lightGray
+                , Css.backgroundColor themeProperties.primaryColor
                 , Css.fontSize (Css.em 2)
                 ]
             ]
@@ -262,10 +325,10 @@ numberColumnWidth =
     Css.width (Css.vw 30)
 
 
-cardView : Int -> Card -> List (Html Msg)
-cardView cardIndex card =
-    (indexedMap (questionView cardIndex) card.questions |> Array.toList)
-        ++ [ partlySumView card
+cardView : ThemeProperties -> Int -> Card -> List (Html Msg)
+cardView themeProperties cardIndex card =
+    (indexedMap (questionView themeProperties cardIndex) card.questions |> Array.toList)
+        ++ [ partlySumView themeProperties card
            ]
 
 
@@ -278,14 +341,14 @@ partlySum card =
         |> Maybe.map List.sum
 
 
-partlySumView : Card -> Html Msg
-partlySumView card =
+partlySumView : ThemeProperties -> Card -> Html Msg
+partlySumView themeProperties card =
     tr
         [ Attributes.css
             [ Css.minHeight (Css.em 7)
             , Css.height (Css.em 7)
             , Css.maxHeight (Css.em 7)
-            , Css.backgroundColor lightGray
+            , Css.backgroundColor themeProperties.primaryColor
             ]
         ]
         [ td
@@ -337,25 +400,20 @@ totalSum model =
         ]
 
 
-lightGray : Css.Color
-lightGray =
-    Css.rgb 220 220 220
-
-
-backgroundColorForCard : Int -> Css.Color
-backgroundColorForCard cardNumber =
+backgroundColorForCard : ThemeProperties -> Int -> Css.Color
+backgroundColorForCard themeProperties cardNumber =
     if
         (cardNumber >= 9 && cardNumber < 14 && modBy 2 cardNumber == 1)
             || ((cardNumber < 8 || cardNumber > 14) && modBy 2 cardNumber == 0)
     then
-        Css.rgb 220 220 220
+        themeProperties.primaryColor
 
     else
-        Css.rgb 255 255 255
+        themeProperties.backgroundColor
 
 
-questionView : Int -> Int -> Question -> Html Msg
-questionView cardIndex questionIndex question =
+questionView : ThemeProperties -> Int -> Int -> Question -> Html Msg
+questionView themeProperties cardIndex questionIndex question =
     let
         cardNumber : Int
         cardNumber =
@@ -368,7 +426,7 @@ questionView cardIndex questionIndex question =
         answerColor =
             maybeScore |> Maybe.map colorForScore |> Maybe.withDefault (Css.rgb 0 0 0)
     in
-    tr [ Attributes.css [ Css.backgroundColor (backgroundColorForCard cardNumber) ] ]
+    tr [ Attributes.css [ Css.backgroundColor (backgroundColorForCard themeProperties cardNumber) ] ]
         [ td
             [ Attributes.css
                 [ Css.fontSize (Css.em 5)
@@ -379,9 +437,9 @@ questionView cardIndex questionIndex question =
             ]
             [ cardNumber |> String.fromInt |> text ]
         , td [ Attributes.css [ guessInputWidth ] ]
-            [ numberInput question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1)
+            [ numberInput themeProperties question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1)
             ]
-        , td [] [ numberInput question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
+        , td [] [ numberInput themeProperties question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
         , td
             [ Attributes.css
                 [ Css.fontSize (Css.em 5)
@@ -436,15 +494,15 @@ colorForScore n =
         Css.rgba red green blue 0.7
 
 
-numberInput : String -> (String -> Msg) -> Int -> Html Msg
-numberInput valueString msg tabIndex =
+numberInput : ThemeProperties -> String -> (String -> Msg) -> Int -> Html Msg
+numberInput themeProperties valueString msg tabIndex =
     let
         textColor =
             if valueString == "" || isLegalNumber valueString then
-                Css.rgb 0 0 0
+                themeProperties.textColor
 
             else
-                Css.rgb 220 0 0
+                themeProperties.errorTextColor
     in
     input
         [ value valueString
