@@ -100,7 +100,7 @@ darkTheme =
 initialModel : Model
 initialModel =
     { cards = Array.initialize 3 (always emptyCard)
-    , theme = Dark
+    , theme = Light
     , menuExpanded = False
     }
 
@@ -268,7 +268,7 @@ styledView model themeProperties =
                 , Css.maxWidth (Css.pct 100)
                 ]
             ]
-            [ headerRow themeProperties
+            [ headerRow model themeProperties
             , tbody [] ((indexedMap (cardView themeProperties) model.cards |> Array.toList |> List.concat) ++ [ totalSum model ])
             ]
         ]
@@ -280,12 +280,12 @@ expandedMenu model themeProperties =
         div
             [ Attributes.css
                 [ Css.width (Css.rem 20)
-                , Css.left (Css.rem 1.2)
+                , Css.left (Css.rem 0.44)
                 , Css.top (Css.rem 6)
                 , Css.position Css.absolute
                 , Css.zIndex (Css.int 2)
                 , Css.backgroundColor themeProperties.backgroundColor
-                , Css.border3 (Css.px 1) Css.solid themeProperties.primaryColor
+                , Css.border3 (Css.rem 0.1) Css.solid themeProperties.textColor
                 ]
             ]
             [ ul []
@@ -299,8 +299,8 @@ expandedMenu model themeProperties =
         text ""
 
 
-headerRow : ThemeProperties -> Html Msg
-headerRow themeProperties =
+headerRow : Model -> ThemeProperties -> Html Msg
+headerRow model themeProperties =
     thead
         []
         [ tr
@@ -322,7 +322,7 @@ headerRow themeProperties =
                     , Css.width (Css.pct 100)
                     ]
                 ]
-                [ burgerMenuIcon themeProperties
+                [ burgerMenuIcon model themeProperties
                 ]
             , th [ Attributes.css [ guessInputWidth ] ]
                 [ text "Ditt svar 0-100"
@@ -341,43 +341,86 @@ headerRow themeProperties =
         ]
 
 
-burgerMenuIcon : ThemeProperties -> Html Msg
-burgerMenuIcon themeProperties =
+burgerLine : Model -> ThemeProperties -> Bool -> Bool -> Html Msg
+burgerLine model themeProperties isBottomLine isMiddleLine =
     let
-        line : Bool -> Html Msg
-        line withMargin =
-            div
-                [ Attributes.css
-                    [ Css.backgroundColor themeProperties.textColor
-                    , Css.height (Css.rem 0.3)
-                    , Css.marginBottom
-                        (Css.rem
-                            (if withMargin then
-                                0.5
+        baseStyles =
+            [ Css.height (Css.rem 0.3)
+            , Css.width (Css.rem 2.5)
+            , Css.backgroundColor themeProperties.textColor
+            , Css.property "transition" "transform 300ms ease-in-out, opacity 300ms ease-in-out"
+            ]
 
-                             else
-                                0
-                            )
+        closedStyles =
+            if model.menuExpanded then
+                []
+
+            else
+                [ Css.marginBottom
+                    (Css.rem
+                        (if isBottomLine then
+                            0.5
+
+                         else
+                            0
                         )
-                    ]
+                    )
                 ]
+
+        ( rotationDegree, topPosition ) =
+            if isBottomLine then
+                ( 45, 0.3 )
+
+            else
+                ( -45, -0.3 )
+
+        transformStyles =
+            if model.menuExpanded then
+                if isMiddleLine then
+                    [ Css.opacity (Css.int 0) ]
+
+                else if not isMiddleLine then
+                    if model.menuExpanded then
+                        [ Css.transform
+                            (Css.rotate (Css.deg rotationDegree))
+                        , Css.position Css.relative
+                        , Css.top (Css.rem topPosition)
+                        ]
+
+                    else
+                        [ Css.transform
+                            (Css.rotate (Css.deg -45))
+                        , Css.position Css.relative
+                        , Css.top (Css.px 5)
+                        ]
+
+                else
+                    []
+
+            else
                 []
     in
+    div
+        [ Attributes.css (baseStyles ++ closedStyles ++ transformStyles) ]
+        []
+
+
+burgerMenuIcon : Model -> ThemeProperties -> Html Msg
+burgerMenuIcon model themeProperties =
     div
         [ Attributes.css
             [ Css.displayFlex
             , Css.flexDirection Css.column
             , Css.justifyContent Css.center
             , Css.cursor Css.pointer
-            , Css.width (Css.rem 2.5)
             , Css.height (Css.rem 3)
             ]
         , Attributes.id "burger-menu-icon"
         , onClick ToggleMenu
         ]
-        [ line True
-        , line True
-        , line False
+        [ burgerLine model themeProperties True False
+        , burgerLine model themeProperties True True
+        , burgerLine model themeProperties False False
         ]
 
 
