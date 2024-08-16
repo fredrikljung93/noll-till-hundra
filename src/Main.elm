@@ -168,6 +168,7 @@ type Msg
     = Guess Int Int String
     | FillAnswer Int Int String
     | ToggleMenu
+    | SetTheme Theme
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -248,6 +249,9 @@ update msg model =
         ToggleMenu ->
             ( { model | menuExpanded = not model.menuExpanded }, Cmd.none )
 
+        SetTheme theme ->
+            ( { model | theme = theme, menuExpanded = False }, Cmd.none )
+
 
 styledView : Model -> ThemeProperties -> Html Msg
 styledView model themeProperties =
@@ -279,8 +283,9 @@ expandedMenu model themeProperties =
     if model.menuExpanded then
         div
             [ Attributes.css
-                [ Css.width (Css.rem 20)
+                [ Css.width (Css.rem 40)
                 , Css.left (Css.rem 0.44)
+                , Css.minHeight (Css.rem 5)
                 , Css.top (Css.rem 6)
                 , Css.position Css.absolute
                 , Css.zIndex (Css.int 2)
@@ -288,15 +293,45 @@ expandedMenu model themeProperties =
                 , Css.border3 (Css.rem 0.1) Css.solid themeProperties.textColor
                 ]
             ]
-            [ ul []
-                [ li [ Attributes.css [ Css.padding (Css.px 10) ] ] [ text "Option 1" ]
-                , li [ Attributes.css [ Css.padding (Css.px 10) ] ] [ text "Option 2" ]
-                , li [ Attributes.css [ Css.padding (Css.px 10) ] ] [ text "Option 3" ]
+            [ div []
+                [ themeSelector model
                 ]
             ]
 
     else
         text ""
+
+
+menuOption : String -> Msg -> Html Msg
+menuOption displayText msg =
+    div
+        [ Attributes.css
+            [ Css.cursor Css.pointer
+            , Css.marginTop (Css.rem 1)
+            , Css.marginLeft (Css.rem 1)
+            , Css.fontSize (Css.rem 2)
+            , Css.hover
+                [ Css.textDecoration Css.underline
+                ]
+            ]
+        , onClick msg
+        ]
+        [ text displayText
+        ]
+
+
+themeSelector : Model -> Html Msg
+themeSelector model =
+    let
+        ( displayText, nextTheme ) =
+            case model.theme of
+                Light ->
+                    ( "Växla till mörkt tema", Dark )
+
+                Dark ->
+                    ( "Växla till ljust tema", Light )
+    in
+    menuOption displayText (SetTheme nextTheme)
 
 
 headerRow : Model -> ThemeProperties -> Html Msg
