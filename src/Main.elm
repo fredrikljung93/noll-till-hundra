@@ -317,14 +317,24 @@ headerRow themeProperties =
 burgerMenuIcon : ThemeProperties -> Html Msg
 burgerMenuIcon themeProperties =
     let
-        lineColor =
-            themeProperties.textColor
+        line : Bool -> Html Msg
+        line withMargin =
+            div
+                [ Attributes.css
+                    [ Css.backgroundColor themeProperties.textColor
+                    , Css.height (Css.rem 0.3)
+                    , Css.marginBottom
+                        (Css.rem
+                            (if withMargin then
+                                0.5
 
-        lineWidth =
-            Css.rem 2.5
-
-        lineThickness =
-            Css.rem 0.3
+                             else
+                                0
+                            )
+                        )
+                    ]
+                ]
+                []
     in
     div
         [ Attributes.css
@@ -332,7 +342,7 @@ burgerMenuIcon themeProperties =
             , Css.flexDirection Css.column
             , Css.justifyContent Css.center
             , Css.cursor Css.pointer
-            , Css.width lineWidth
+            , Css.width (Css.rem 2.5)
             , Css.height (Css.rem 3)
             , Css.marginLeft (Css.rem 1)
             , Css.marginRight (Css.rem 1)
@@ -340,9 +350,9 @@ burgerMenuIcon themeProperties =
         , Attributes.id "burger-menu-icon"
         , onClick ToggleMenu
         ]
-        [ div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness, Css.marginBottom (Css.px 5) ] ] []
-        , div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness, Css.marginBottom (Css.px 5) ] ] []
-        , div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness ] ] []
+        [ line True
+        , line True
+        , line False
         ]
 
 
