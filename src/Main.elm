@@ -281,6 +281,9 @@ update msg model =
                     if List.member question [ 1, 8, 15 ] then
                         scrollToElementById (questionNumberToId question)
 
+                    else if question == 21 then
+                        scrollToElementById (questionNumberToId 21)
+
                     else
                         Cmd.none
             in
