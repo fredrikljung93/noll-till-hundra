@@ -1,23 +1,27 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Array exposing (Array, indexedMap)
 import Browser
 import Css
 import Css.Global
-import Html.Styled exposing (Html, div, input, li, strong, table, tbody, td, text, th, thead, tr, ul)
+import Html.Styled exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Styled.Attributes as Attributes exposing (colspan, type_, value)
 import Html.Styled.Events exposing (onClick, onInput)
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( initialModel, Cmd.none )
+init : Maybe String -> ( Model, Cmd Msg )
+init maybeThemeString =
+    let
+        initTheme =
+            maybeThemeString |> Maybe.andThen stringToTheme |> Maybe.withDefault Light
+    in
+    ( initialModel initTheme, Cmd.none )
 
 
-main : Program () Model Msg
+main : Program (Maybe String) Model Msg
 main =
     Browser.document
-        { init = \_ -> init
+        { init = init
         , view = document
         , update = update
         , subscriptions = always Sub.none
@@ -101,10 +105,10 @@ emptyCards =
     Array.initialize 3 (always emptyCard)
 
 
-initialModel : Model
-initialModel =
+initialModel : Theme -> Model
+initialModel theme =
     { cards = emptyCards
-    , theme = Light
+    , theme = theme
     , menuExpanded = False
     }
 
@@ -174,6 +178,7 @@ type Msg
     | ToggleMenu
     | SetTheme Theme
     | Reset
+    | ReceiveProperty String String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -258,7 +263,39 @@ update msg model =
             ( { model | cards = emptyCards } |> closeMenu, Cmd.none )
 
         SetTheme theme ->
-            ( { model | theme = theme } |> closeMenu, Cmd.none )
+            ( { model | theme = theme } |> closeMenu
+            , saveProperty ( "THEME", themeToString theme )
+            )
+
+        ReceiveProperty key value ->
+            if String.toUpper key == "THEME" then
+                ( { model | theme = stringToTheme value |> Maybe.withDefault model.theme }, Cmd.none )
+
+            else
+                ( model, Cmd.none )
+
+
+themeToString : Theme -> String
+themeToString t =
+    case t of
+        Light ->
+            "LIGHT"
+
+        Dark ->
+            "DARK"
+
+
+stringToTheme : String -> Maybe Theme
+stringToTheme s =
+    case String.toUpper s of
+        "LIGHT" ->
+            Just Light
+
+        "DARK" ->
+            Just Dark
+
+        _ ->
+            Nothing
 
 
 closeMenu : Model -> Model
@@ -709,3 +746,10 @@ convertList maybeList =
                         convertList rest
                             |> Maybe.map (\convertedList -> value :: convertedList)
                     )
+
+
+
+-- PORTS
+
+
+port saveProperty : ( String, String ) -> Cmd msg
