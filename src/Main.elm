@@ -6,7 +6,7 @@ import Css
 import Css.Global
 import Html.Styled exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Styled.Attributes as Attributes exposing (colspan, type_, value)
-import Html.Styled.Events exposing (onClick, onInput)
+import Html.Styled.Events exposing (onClick, onFocus, onInput)
 
 
 init : Maybe String -> ( Model, Cmd Msg )
@@ -179,6 +179,7 @@ type Msg
     | SetTheme Theme
     | Reset
     | ReceiveProperty String String
+    | QuestionFocus Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -273,6 +274,17 @@ update msg model =
 
             else
                 ( model, Cmd.none )
+
+        QuestionFocus question ->
+            let
+                cmd =
+                    if List.member question [ 1, 8, 15 ] then
+                        scrollToElementById (questionNumberToId question)
+
+                    else
+                        Cmd.none
+            in
+            ( model, cmd )
 
 
 themeToString : Theme -> String
@@ -401,7 +413,7 @@ headerRow model themeProperties =
             ]
             [ th
                 [ Attributes.css
-                    [ cardNumberWidth
+                    [ questionNumberWidth
                     , Css.displayFlex
                     , Css.justifyContent Css.center
                     , Css.alignItems Css.center
@@ -514,8 +526,8 @@ burgerMenuIcon model themeProperties =
         ]
 
 
-cardNumberWidth : Css.Style
-cardNumberWidth =
+questionNumberWidth : Css.Style
+questionNumberWidth =
     Css.width (Css.vw 7)
 
 
@@ -632,11 +644,16 @@ backgroundColorForCard themeProperties questionIndex =
         themeProperties.backgroundColor
 
 
+questionNumberToId : Int -> String
+questionNumberToId n =
+    String.append "question-" (String.fromInt n)
+
+
 questionView : ThemeProperties -> Int -> Int -> Question -> Html Msg
 questionView themeProperties cardIndex questionIndex question =
     let
-        cardNumber : Int
-        cardNumber =
+        questionNumber : Int
+        questionNumber =
             1 + (questionIndex + cardIndex * 7)
 
         maybeScore : Maybe Int
@@ -653,20 +670,33 @@ questionView themeProperties cardIndex questionIndex question =
             , Css.height lineHeight
             , Css.maxHeight lineHeight
             ]
+        , Attributes.id (questionNumberToId questionNumber)
         ]
         [ td
             [ Attributes.css
                 [ Css.fontSize (Css.em 5)
                 , Css.textAlign Css.right
                 , Css.fontWeight Css.bold
-                , cardNumberWidth
+                , questionNumberWidth
                 ]
             ]
-            [ cardNumber |> String.fromInt |> String.padLeft 2 ' ' |> text ]
+            [ questionNumber |> String.fromInt |> String.padLeft 2 ' ' |> text ]
         , td [ Attributes.css [ guessInputWidth ] ]
-            [ numberInput themeProperties question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1)
+            [ numberInput
+                questionNumber
+                themeProperties
+                question.guess
+                (Guess cardIndex questionIndex)
+                (cardIndex * 10 + 1)
             ]
-        , td [] [ numberInput themeProperties question.answer (FillAnswer cardIndex questionIndex) (cardIndex * 10 + 2) ]
+        , td []
+            [ numberInput
+                questionNumber
+                themeProperties
+                question.answer
+                (FillAnswer cardIndex questionIndex)
+                (cardIndex * 10 + 2)
+            ]
         , td
             [ Attributes.css
                 [ Css.fontSize (Css.em 5)
@@ -721,8 +751,8 @@ colorForScore n =
         Css.rgba red green blue 0.7
 
 
-numberInput : ThemeProperties -> String -> (String -> Msg) -> Int -> Html Msg
-numberInput themeProperties valueString msg tabIndex =
+numberInput : Int -> ThemeProperties -> String -> (String -> Msg) -> Int -> Html Msg
+numberInput question themeProperties valueString msg tabIndex =
     let
         textColor =
             if valueString == "" || isLegalNumber valueString then
@@ -734,6 +764,7 @@ numberInput themeProperties valueString msg tabIndex =
     input
         [ value valueString
         , onInput msg
+        , onFocus (QuestionFocus question)
         , type_ "number"
         , Attributes.min "0"
         , Attributes.max "100"
@@ -772,3 +803,6 @@ convertList maybeList =
 
 
 port saveProperty : ( String, String ) -> Cmd msg
+
+
+port scrollToElementById : String -> Cmd msg
