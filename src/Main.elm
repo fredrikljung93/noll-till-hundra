@@ -4,7 +4,7 @@ import Array exposing (Array, indexedMap)
 import Browser
 import Css
 import Css.Global
-import Html.Styled exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
+import Html.Styled exposing (Html, div, input, li, strong, table, tbody, td, text, th, thead, tr, ul)
 import Html.Styled.Attributes as Attributes exposing (colspan, type_, value)
 import Html.Styled.Events exposing (onClick, onInput)
 
@@ -259,7 +259,8 @@ styledView model themeProperties =
             , Css.flexDirection Css.column
             ]
         ]
-        [ table
+        [ expandedMenu model themeProperties
+        , table
             [ Attributes.css
                 [ Css.width (Css.pct 100)
                 , Css.height (Css.pct 100)
@@ -271,6 +272,31 @@ styledView model themeProperties =
             , tbody [] ((indexedMap (cardView themeProperties) model.cards |> Array.toList |> List.concat) ++ [ totalSum model ])
             ]
         ]
+
+
+expandedMenu : Model -> ThemeProperties -> Html Msg
+expandedMenu model themeProperties =
+    if model.menuExpanded then
+        div
+            [ Attributes.css
+                [ Css.width (Css.rem 20)
+                , Css.left (Css.rem 1.2)
+                , Css.top (Css.rem 6)
+                , Css.position Css.absolute
+                , Css.zIndex (Css.int 2)
+                , Css.backgroundColor themeProperties.backgroundColor
+                , Css.border3 (Css.px 1) Css.solid themeProperties.primaryColor
+                ]
+            ]
+            [ ul []
+                [ li [ Attributes.css [ Css.padding (Css.px 10) ] ] [ text "Option 1" ]
+                , li [ Attributes.css [ Css.padding (Css.px 10) ] ] [ text "Option 2" ]
+                , li [ Attributes.css [ Css.padding (Css.px 10) ] ] [ text "Option 3" ]
+                ]
+            ]
+
+    else
+        text ""
 
 
 headerRow : ThemeProperties -> Html Msg
@@ -293,6 +319,7 @@ headerRow themeProperties =
                     , Css.justifyContent Css.center
                     , Css.alignItems Css.center
                     , Css.height (Css.pct 100)
+                    , Css.width (Css.pct 100)
                     ]
                 ]
                 [ burgerMenuIcon themeProperties
@@ -344,8 +371,6 @@ burgerMenuIcon themeProperties =
             , Css.cursor Css.pointer
             , Css.width (Css.rem 2.5)
             , Css.height (Css.rem 3)
-            , Css.marginLeft (Css.rem 1)
-            , Css.marginRight (Css.rem 1)
             ]
         , Attributes.id "burger-menu-icon"
         , onClick ToggleMenu
@@ -491,7 +516,7 @@ questionView themeProperties cardIndex questionIndex question =
                 , cardNumberWidth
                 ]
             ]
-            [ cardNumber |> String.fromInt |> text ]
+            [ cardNumber |> String.fromInt |> String.padLeft 2 ' ' |> text ]
         , td [ Attributes.css [ guessInputWidth ] ]
             [ numberInput themeProperties question.guess (Guess cardIndex questionIndex) (cardIndex * 10 + 1)
             ]
