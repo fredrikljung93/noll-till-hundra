@@ -97,9 +97,13 @@ darkTheme =
 -- MODEL
 
 
+emptyCards =
+    Array.initialize 3 (always emptyCard)
+
+
 initialModel : Model
 initialModel =
-    { cards = Array.initialize 3 (always emptyCard)
+    { cards = emptyCards
     , theme = Light
     , menuExpanded = False
     }
@@ -169,6 +173,7 @@ type Msg
     | FillAnswer Int Int String
     | ToggleMenu
     | SetTheme Theme
+    | Reset
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -249,8 +254,16 @@ update msg model =
         ToggleMenu ->
             ( { model | menuExpanded = not model.menuExpanded }, Cmd.none )
 
+        Reset ->
+            ( { model | cards = emptyCards } |> closeMenu, Cmd.none )
+
         SetTheme theme ->
-            ( { model | theme = theme, menuExpanded = False }, Cmd.none )
+            ( { model | theme = theme } |> closeMenu, Cmd.none )
+
+
+closeMenu : Model -> Model
+closeMenu model =
+    { model | menuExpanded = False }
 
 
 styledView : Model -> ThemeProperties -> Html Msg
@@ -295,6 +308,7 @@ expandedMenu model themeProperties =
             ]
             [ div []
                 [ themeSelector model
+                , menuOption "Återställ poängbrickan" Reset
                 ]
             ]
 
