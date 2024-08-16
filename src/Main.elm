@@ -431,9 +431,12 @@ headerRow model themeProperties =
 burgerLine : Model -> ThemeProperties -> Bool -> Bool -> Html Msg
 burgerLine model themeProperties isBottomLine isMiddleLine =
     let
+        height =
+            0.5
+
         baseStyles =
-            [ Css.height (Css.rem 0.3)
-            , Css.width (Css.rem 2.5)
+            [ Css.height (Css.rem height)
+            , Css.width (Css.rem 4)
             , Css.backgroundColor themeProperties.textColor
             , Css.property "transition" "transform 300ms ease-in-out, opacity 300ms ease-in-out"
             ]
@@ -446,7 +449,7 @@ burgerLine model themeProperties isBottomLine isMiddleLine =
                 [ Css.marginBottom
                     (Css.rem
                         (if isBottomLine then
-                            0.5
+                            height * 1.5
 
                          else
                             0
@@ -456,10 +459,10 @@ burgerLine model themeProperties isBottomLine isMiddleLine =
 
         ( rotationDegree, topPosition ) =
             if isBottomLine then
-                ( 45, 0.3 )
+                ( 45, height )
 
             else
-                ( -45, -0.3 )
+                ( -45, height * -1 )
 
         transformStyles =
             if model.menuExpanded then
