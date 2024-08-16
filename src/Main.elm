@@ -321,9 +321,10 @@ menuOption displayText msg =
     div
         [ Attributes.css
             [ Css.cursor Css.pointer
-            , Css.marginTop (Css.rem 1)
-            , Css.marginLeft (Css.rem 1)
-            , Css.fontSize (Css.rem 2)
+            , Css.marginTop (Css.rem 2)
+            , Css.marginBottom (Css.rem 3)
+            , Css.marginLeft (Css.rem 2)
+            , Css.fontSize (Css.rem 3)
             , Css.hover
                 [ Css.textDecoration Css.underline
                 ]
