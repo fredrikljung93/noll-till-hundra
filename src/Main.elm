@@ -280,7 +280,20 @@ headerRow themeProperties =
                 , Css.fontSize (Css.em 2)
                 ]
             ]
-            [ th [ Attributes.css [ yourGuessColspan2Width ], colspan 2 ] [ text "Ditt svar 0-100" ]
+            [ th
+                [ Attributes.css
+                    [ cardNumberWidth
+                    , Css.displayFlex
+                    , Css.justifyContent Css.center
+                    , Css.alignItems Css.center
+                    , Css.height (Css.pct 100)
+                    ]
+                ]
+                [ burgerMenuIcon themeProperties
+                ]
+            , th [ Attributes.css [ guessInputWidth ] ]
+                [ text "Ditt svar 0-100"
+                ]
             , th
                 [ colspan 1
                 , Attributes.css [ correctAnswerWidth ]
@@ -295,19 +308,45 @@ headerRow themeProperties =
         ]
 
 
+burgerMenuIcon : ThemeProperties -> Html msg
+burgerMenuIcon themeProperties =
+    let
+        lineColor =
+            themeProperties.textColor
+
+        lineWidth =
+            Css.rem 2.5
+
+        lineThickness =
+            Css.rem 0.3
+    in
+    div
+        [ Attributes.css
+            [ Css.displayFlex
+            , Css.flexDirection Css.column
+            , Css.justifyContent Css.center
+            , Css.cursor Css.pointer
+            , Css.width lineWidth
+            , Css.height (Css.rem 3)
+            , Css.marginLeft (Css.rem 1)
+            , Css.marginRight (Css.rem 1)
+            ]
+        , Attributes.id "burgermenu"
+        ]
+        [ div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness, Css.marginBottom (Css.px 5) ] ] []
+        , div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness, Css.marginBottom (Css.px 5) ] ] []
+        , div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness ] ] []
+        ]
+
+
 cardNumberWidth : Css.Style
 cardNumberWidth =
-    Css.important (Css.width (Css.vw 10))
-
-
-yourGuessColspan2Width : Css.Style
-yourGuessColspan2Width =
-    Css.width (Css.vw 40)
+    Css.width (Css.vw 7)
 
 
 guessInputWidth : Css.Style
 guessInputWidth =
-    Css.important numberColumnWidth
+    numberColumnWidth
 
 
 correctAnswerWidth : Css.Style
@@ -322,7 +361,7 @@ diffWidth =
 
 numberColumnWidth : Css.Style
 numberColumnWidth =
-    Css.width (Css.vw 30)
+    Css.width (Css.vw 31)
 
 
 cardView : ThemeProperties -> Int -> Card -> List (Html Msg)
