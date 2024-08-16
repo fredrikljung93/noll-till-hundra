@@ -6,7 +6,7 @@ import Css
 import Css.Global
 import Html.Styled exposing (Html, div, input, strong, table, tbody, td, text, th, thead, tr)
 import Html.Styled.Attributes as Attributes exposing (colspan, type_, value)
-import Html.Styled.Events exposing (onInput)
+import Html.Styled.Events exposing (onClick, onInput)
 
 
 init : ( Model, Cmd Msg )
@@ -101,6 +101,7 @@ initialModel : Model
 initialModel =
     { cards = Array.initialize 3 (always emptyCard)
     , theme = Dark
+    , menuExpanded = False
     }
 
 
@@ -118,6 +119,7 @@ type alias Question =
 type alias Model =
     { cards : Array Card
     , theme : Theme
+    , menuExpanded : Bool
     }
 
 
@@ -165,6 +167,7 @@ isLegalNumber s =
 type Msg
     = Guess Int Int String
     | FillAnswer Int Int String
+    | ToggleMenu
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -242,6 +245,9 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        ToggleMenu ->
+            ( { model | menuExpanded = not model.menuExpanded }, Cmd.none )
+
 
 styledView : Model -> ThemeProperties -> Html Msg
 styledView model themeProperties =
@@ -308,7 +314,7 @@ headerRow themeProperties =
         ]
 
 
-burgerMenuIcon : ThemeProperties -> Html msg
+burgerMenuIcon : ThemeProperties -> Html Msg
 burgerMenuIcon themeProperties =
     let
         lineColor =
@@ -331,7 +337,8 @@ burgerMenuIcon themeProperties =
             , Css.marginLeft (Css.rem 1)
             , Css.marginRight (Css.rem 1)
             ]
-        , Attributes.id "burgermenu"
+        , Attributes.id "burger-menu-icon"
+        , onClick ToggleMenu
         ]
         [ div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness, Css.marginBottom (Css.px 5) ] ] []
         , div [ Attributes.css [ Css.backgroundColor lineColor, Css.height lineThickness, Css.marginBottom (Css.px 5) ] ] []
