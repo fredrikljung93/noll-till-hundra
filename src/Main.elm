@@ -552,13 +552,18 @@ partlySum card =
         |> Maybe.map List.sum
 
 
+lineHeight : Css.Em
+lineHeight =
+    Css.em 8
+
+
 partlySumView : ThemeProperties -> Card -> Html Msg
 partlySumView themeProperties card =
     tr
         [ Attributes.css
-            [ Css.minHeight (Css.em 7)
-            , Css.height (Css.em 7)
-            , Css.maxHeight (Css.em 7)
+            [ Css.minHeight lineHeight
+            , Css.height lineHeight
+            , Css.maxHeight lineHeight
             , Css.backgroundColor themeProperties.primaryColor
             ]
         ]
@@ -586,7 +591,11 @@ totalSum model =
                 |> Maybe.map List.sum
     in
     tr
-        [ Attributes.css [ Css.minHeight (Css.em 7), Css.height (Css.em 7) ]
+        [ Attributes.css
+            [ Css.minHeight lineHeight
+            , Css.height lineHeight
+            , Css.maxHeight lineHeight
+            ]
         ]
         [ td
             [ colspan 3
@@ -634,7 +643,14 @@ questionView themeProperties cardIndex questionIndex question =
         answerColor =
             maybeScore |> Maybe.map colorForScore |> Maybe.withDefault (Css.rgb 0 0 0)
     in
-    tr [ Attributes.css [ Css.backgroundColor (backgroundColorForCard themeProperties questionIndex) ] ]
+    tr
+        [ Attributes.css
+            [ Css.backgroundColor (backgroundColorForCard themeProperties questionIndex)
+            , Css.minHeight lineHeight
+            , Css.height lineHeight
+            , Css.maxHeight lineHeight
+            ]
+        ]
         [ td
             [ Attributes.css
                 [ Css.fontSize (Css.em 5)
