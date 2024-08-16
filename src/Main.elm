@@ -575,11 +575,8 @@ totalSum model =
 
 
 backgroundColorForCard : ThemeProperties -> Int -> Css.Color
-backgroundColorForCard themeProperties cardNumber =
-    if
-        (cardNumber >= 9 && cardNumber < 14 && modBy 2 cardNumber == 1)
-            || ((cardNumber < 8 || cardNumber > 14) && modBy 2 cardNumber == 0)
-    then
+backgroundColorForCard themeProperties questionIndex =
+    if modBy 2 questionIndex == 1 then
         themeProperties.primaryColor
 
     else
@@ -600,7 +597,7 @@ questionView themeProperties cardIndex questionIndex question =
         answerColor =
             maybeScore |> Maybe.map colorForScore |> Maybe.withDefault (Css.rgb 0 0 0)
     in
-    tr [ Attributes.css [ Css.backgroundColor (backgroundColorForCard themeProperties cardNumber) ] ]
+    tr [ Attributes.css [ Css.backgroundColor (backgroundColorForCard themeProperties questionIndex) ] ]
         [ td
             [ Attributes.css
                 [ Css.fontSize (Css.em 5)
